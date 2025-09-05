@@ -1,0 +1,14 @@
+{
+  "bicycle": {
+    "name": "Bicycle",
+    "science": "Mechanical advantage, circular motion, energy conversion.",
+    "history": "Invented in the early 19th century, revolutionized personal transport.",
+    "math": "Gear ratios, rotational speed, distance calculation."
+  },
+  "apple": {
+    "name": "Apple",
+    "science": "Photosynthesis, nutrition, genetics.",
+    "history": "Domesticated thousands of years ago, key in many cultures.",
+    "math": "Counting seeds, symmetry, volume estimation."
+  }
+}
