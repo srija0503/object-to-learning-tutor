@@ -1,0 +1,40 @@
+{
+  "bicycle": {
+    "questions": [
+      {
+        "question": "What is a key scientific principle demonstrated by a bicycle?",
+        "options": ["Photosynthesis", "Mechanical advantage", "Gravity", "Evaporation"],
+        "answer": "Mechanical advantage"
+      },
+      {
+        "question": "When was the bicycle invented?",
+        "options": ["Early 19th century", "18th century", "20th century", "Ancient Rome"],
+        "answer": "Early 19th century"
+      },
+      {
+        "question": "What math concept relates to the gears on a bicycle?",
+        "options": ["Addition", "Gear ratios", "Symmetry", "Multiplication"],
+        "answer": "Gear ratios"
+      }
+    ]
+  },
+  "apple": {
+    "questions": [
+      {
+        "question": "What process helps apples grow?",
+        "options": ["Photosynthesis", "Combustion", "Fermentation", "Evaporation"],
+        "answer": "Photosynthesis"
+      },
+      {
+        "question": "How long ago were apples domesticated?",
+        "options": ["Thousands of years", "Hundreds of years", "Yesterday", "Never"],
+        "answer": "Thousands of years"
+      },
+      {
+        "question": "What math concept can you learn from counting apple seeds?",
+        "options": ["Symmetry", "Multiplication", "Volume estimation", "Counting"],
+        "answer": "Counting"
+      }
+    ]
+  }
+}
