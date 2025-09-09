@@ -1,0 +1,14 @@
+import axios from 'axios';
+
+const API_URL = 'http://<YOUR_BACKEND_IP>:5000/api';
+
+export default {
+  getObjectInfo: async (imageBase64) => {
+    const res = await axios.post(`${API_URL}/object/recognize`, { image: imageBase64 });
+    return res.data;
+  },
+  getQuiz: async (objectName) => {
+    const res = await axios.get(`${API_URL}/quiz/${objectName}`);
+    return res.data;
+  }
+};
