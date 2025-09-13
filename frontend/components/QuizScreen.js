@@ -1,47 +1,53 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
-import objectApi from '../api/objectApi';
+import React, { useState } from 'react';
+import { View, Text, Button, StyleSheet, ScrollView } from 'react-native';
 
 export default function QuizScreen({ route, navigation }) {
-  const { object } = route.params;
-  const [quiz, setQuiz] = useState(null);
+  const { quizData } = route.params; // received from ObjectInfoScreen
   const [step, setStep] = useState(0);
   const [score, setScore] = useState(0);
 
-  useEffect(() => {
-    async function fetchQuiz() {
-      const q = await objectApi.getQuiz(object);
-      setQuiz(q);
-    }
-    fetchQuiz();
-  }, []);
+  if (!quizData || !quizData.questions || quizData.questions.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text>No quiz available for this object.</Text>
+        <Button title="Back" onPress={() => navigation.goBack()} />
+      </View>
+    );
+  }
 
-  if (!quiz) return <Text>Loading...</Text>;
-  if (step >= quiz.questions.length)
+  // Quiz complete
+  if (step >= quizData.questions.length) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Quiz Complete!</Text>
-        <Text>Your score: {score} / {quiz.questions.length}</Text>
+        <Text>Your score: {score} / {quizData.questions.length}</Text>
         <Button title="Back to Info" onPress={() => navigation.goBack()} />
       </View>
     );
+  }
 
-  const q = quiz.questions[step];
+  const currentQuestion = quizData.questions[step];
+
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Quiz</Text>
-      <Text>{q.question}</Text>
-      {q.options.map((opt, i) => (
-        <Button key={i} title={opt} onPress={() => {
-          if (opt === q.answer) setScore(score + 1);
-          setStep(step + 1);
-        }} />
+      <Text style={styles.question}>{currentQuestion.question}</Text>
+      {currentQuestion.options.map((opt, i) => (
+        <Button
+          key={i}
+          title={opt}
+          onPress={() => {
+            if (opt === currentQuestion.answer) setScore(score + 1);
+            setStep(step + 1);
+          }}
+        />
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { padding: 20 },
-  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 }
+  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 10 },
+  question: { fontSize: 18, marginVertical: 10 },
 });

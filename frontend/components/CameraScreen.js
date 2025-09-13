@@ -1,42 +1,67 @@
-import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, Text, Image } from 'react-native';
-import { Camera } from 'expo-camera';
+import React, { useState, useRef, useEffect } from "react";
+import { View, Text, Button, StyleSheet, Image } from "react-native";
+import { CameraView, useCameraPermissions } from "expo-camera";
+import { useNavigation } from "@react-navigation/native";
 
-export default function CameraScreen({ navigation }) {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [cameraRef, setCameraRef] = useState(null);
+export default function CameraScreen() {
+  const navigation = useNavigation();
+  const [facing, setFacing] = useState("back"); // "back" or "front"
+  const [permission, requestPermission] = useCameraPermissions();
+  const cameraRef = useRef(null);
+  const [photoUri, setPhotoUri] = useState(null);
 
+  // Request permission on mount
   useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
+    if (!permission) requestPermission();
   }, []);
 
-  const takePicture = async () => {
-    if (cameraRef) {
-      const photo = await cameraRef.takePictureAsync({ base64: true });
-      navigation.navigate('ObjectInfo', { image: photo.base64 });
+  if (!permission) return <View />;
+
+  if (!permission.granted) {
+    return (
+      <View style={styles.container}>
+        <Text>We need your permission to show the camera</Text>
+        <Button onPress={requestPermission} title="Grant Permission" />
+      </View>
+    );
+  }
+
+  const toggleCameraFacing = () => {
+    setFacing((current) => (current === "back" ? "front" : "back"));
+  };
+
+  const takePhoto = async () => {
+    if (cameraRef.current) {
+      try {
+        // Capture photo with base64
+        const photo = await cameraRef.current.takePictureAsync({ quality: 0.7, base64: true });
+        setPhotoUri(photo.uri);
+
+        // Navigate and pass both photoUri and base64
+        navigation.navigate("ObjectInfoScreen", {
+          photoUri: photo.uri,
+          imageBase64: photo.base64,
+        });
+      } catch (err) {
+        console.error("Error taking photo:", err);
+      }
     }
   };
 
-  if (hasPermission === null) {
-    return <View />;
-  }
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
-  }
   return (
     <View style={styles.container}>
-      <Camera style={styles.camera} ref={ref => setCameraRef(ref)} />
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={takePicture} style={styles.iconButton}>
-          <Image
-            source={require('../assets/images/icons/camera.png')}
-            style={styles.icon}
-          />
-        </TouchableOpacity>
+      <CameraView
+        style={styles.camera}
+        ref={cameraRef}
+        facing={facing}
+        mode="picture"
+      />
+      <View style={styles.buttons}>
+        <Button title="Flip Camera" onPress={toggleCameraFacing} />
+        <Button title="Capture Photo" onPress={takePhoto} />
       </View>
+
+      {photoUri && <Image source={{ uri: photoUri }} style={styles.preview} />}
     </View>
   );
 }
@@ -44,20 +69,10 @@ export default function CameraScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   camera: { flex: 1 },
-  buttonContainer: {
-    position: 'absolute',
-    bottom: 40,
-    alignSelf: 'center',
+  buttons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginVertical: 10,
   },
-  iconButton: {
-    backgroundColor: '#fff',
-    borderRadius: 35,
-    padding: 15,
-    elevation: 3,
-  },
-  icon: {
-    width: 40,
-    height: 40,
-    tintColor: '#333', // optional, removes if you want original color
-  },
+  preview: { width: "100%", height: 200, marginTop: 10 },
 });

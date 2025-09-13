@@ -1,29 +1,19 @@
-const recognizeObject = require('../ml/recognizeObject');
-const objectsData = require('../data/objects.json');
+// backend/controllers/objectController.js
+const recognizeObject = require('../ml/recognizeObject');  // import once
 
-exports.recognizeObject = async (req, res) => {
-  const { image } = req.body;
-  const objectName = await recognizeObject(image);
-  const objectInfo = objectsData[objectName] || {
-    name: objectName,
-    science: 'Info not found',
-    history: 'Info not found',
-    math: 'Info not found'
-  };
-  res.json(objectInfo);
-};
+exports.recognize = async (req, res) => {
+  try {
+    const { imageBase64 } = req.body;
 
-const recognizeObject = require('../ml/recognizeObject');
-const objectsData = require('../data/objects.json');
+    if (!imageBase64) {
+      return res.status(400).json({ error: 'Image data is required' });
+    }
 
-exports.recognizeObject = async (req, res) => {
-  const { image } = req.body;
-  const objectName = await recognizeObject(image);
-  const objectInfo = objectsData[objectName] || {
-    name: objectName,
-    science: 'Info not found',
-    history: 'Info not found',
-    math: 'Info not found'
-  };
-  res.json(objectInfo);
+    const result = await recognizeObject(imageBase64);
+
+    res.json({ object: result });
+  } catch (error) {
+    console.error('Error recognizing object:', error);
+    res.status(500).json({ error: 'Failed to recognize object' });
+  }
 };

@@ -1,18 +1,22 @@
-const tf = require('@tensorflow/tfjs-node');
-const mobilenet = require('@tensorflow-models/mobilenet');
+// backend/controllers/objectController.js
+const recognizeObject = require('../ml/recognizeObject');  // ✅ only once
 
-let model;
-async function loadModel() {
-  if (!model) model = await mobilenet.load();
-}
+/**
+ * Controller function to handle object recognition
+ */
+exports.recognize = async (req, res) => {
+  try {
+    const { imageBase64 } = req.body;
 
-module.exports = async function recognizeObject(imageBase64) {
-  await loadModel();
-  const buffer = Buffer.from(imageBase64, 'base64');
-  const imageTensor = tf.node.decodeImage(buffer);
-  const predictions = await model.classify(imageTensor);
-  imageTensor.dispose();
-  return predictions[0]?.className?.split(',')[0].toLowerCase() || 'unknown';
+    if (!imageBase64) {
+      return res.status(400).json({ error: 'Image data is required' });
+    }
+
+    const result = await recognizeObject(imageBase64);
+
+    res.json({ object: result });
+  } catch (error) {
+    console.error('Error recognizing object:', error);
+    res.status(500).json({ error: 'Failed to recognize object' });
+  }
 };
-
-
